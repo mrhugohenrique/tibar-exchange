@@ -1,0 +1,113 @@
+<div
+  class="modal-content w-full max-w-xl mx-auto bg-white rounded-lg shadow-lg"
+>
+  <div class="flex items-center justify-between px-4 py-3 border-b">
+    <h3 class="text-lg font-semibold text-gray-800">
+      Atualizar Taxa de Câmbio
+    </h3>
+    <button
+      (click)="handleClose(false)"
+      class="flex items-center justify-center w-8 h-8 rounded-full text-gray-800 hover:text-gray-600 hover:bg-gray-100 transition"
+    >
+      <span class="text-xl font-bold leading-none">×</span>
+    </button>
+  </div>
+
+  <div class="p-4 sm:p-6">
+    <div class="bg-gray-50 p-4 rounded-lg mb-6">
+      <div class="text-sm text-gray-600 mb-1">Taxa Atual</div>
+      <div class="text-lg sm:text-xl font-semibold text-gray-800">
+        1 Ouro Real = {{ currentRate.rate || 0 }} Tibar
+      </div>
+      <div class="text-xs text-gray-500 mt-1">
+        Última atualização: {{ formatDate(currentRate.lastUpdated) }}
+      </div>
+    </div>
+
+    <div class="mb-6">
+      <label
+        for="newRate"
+        class="block text-sm font-medium text-gray-800 mb-2"
+      >
+       Nova Taxa
+      </label>
+      <input
+        id="newRate"
+        type="text"
+        [formControl]="rateForm.controls.newRate"
+        class="input-field w-full"
+        placeholder="2.5"
+        maxlength="8"
+        (input)="validateAmountInput($event, rateForm.controls.newRate)"
+      />
+  
+
+      <div
+        *ngIf="
+          rateForm.controls.newRate.invalid && rateForm.controls.newRate.touched
+        "
+        class="mt-2 text-sm text-red-600"
+      >
+        <span *ngIf="rateForm.controls.newRate.hasError('required')">
+          A nova taxa é obrigatória
+        </span>
+        <span *ngIf="rateForm.controls.newRate.hasError('min')">
+          A taxa deve ser maior que 0,01
+        </span>
+        <span *ngIf="rateForm.controls.newRate.hasError('max')">
+          A taxa não pode exceder 9.999,99
+        </span>
+      </div>
+
+      <div
+        *ngIf="
+          rateForm.controls.newRate.value && rateForm.controls.newRate.valid
+        "
+        class="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-lg mt-4 border border-blue-200"
+      >
+        <div class="text-sm text-blue-800 font-medium mb-2">
+          Prévia da Mudança
+        </div>
+        <div class="space-y-1 text-sm">
+          <div class="flex justify-between">
+            <span class="text-blue-700">100 Ouro Real:</span>
+            <span class="font-medium">
+              {{ 100 * newRateValue | number : "1.2-2" : "pt-BR" }} Tibar
+            </span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-blue-700">100 Tibar:</span>
+            <span class="font-medium">
+              {{ 100 / (newRateValue || 1) | number : "1.2-2" : "pt-BR" }}
+              Ouro Real
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div
+        class="flex flex-col-reverse sm:flex-row justify-end sm:space-x-3 gap-2 sm:gap-0 mt-2"
+      >
+        <button
+          type="button"
+          (click)="handleClose(false)"
+          class="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors w-full sm:w-auto"
+        >
+          Cancelar
+        </button>
+        <button
+          (click)="handleSubmit()"
+          [disabled]="rateForm.invalid || (loading$ | async)"
+          class="btn-primary disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center w-full sm:w-auto"
+        >
+          <div
+            *ngIf="loading$ | async"
+            class="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"
+          ></div>
+          <span *ngIf="!(loading$ | async)">Atualizar Taxa</span>
+          <span *ngIf="loading$ | async">Atualizando...</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

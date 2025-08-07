@@ -1,0 +1,257 @@
+<div class="bg-white rounded-xl card-shadow p-8">
+  <div
+    class="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4"
+  >
+    <div class="flex items-start md:items-center">
+      <div>
+        <h2 class="text-xl md:text-2xl font-bold text-gray-800">
+          Conversão de Moedas
+        </h2>
+        <p class="text-gray-600 text-sm md:text-base">
+          Converta entre Ouro Real e Tibar
+        </p>
+      </div>
+    </div>
+
+    <div class="text-left md:text-right">
+      <!-- Header da taxa -->
+      <div class="flex items-center justify-start md:justify-end mb-2">
+        <svg
+          class="w-4 h-4 text-gray-400 mr-2"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
+          ></path>
+        </svg>
+        <span class="text-sm text-gray-500">Taxa Atual</span>
+      </div>
+
+      <!-- Valor da taxa -->
+      <div class="bg-gray-50 px-3 py-2 rounded-lg mb-3 border border-gray-200">
+        <div class="text-lg font-bold text-gray-800 font-mono">
+          1 = {{ currentRate?.rate || 0 | number : "1.2-2" }}
+        </div>
+      </div>
+
+      <button
+        (click)="handleOpenUpdateRateModal()"
+        class="inline-flex items-center text-sm text-primary-600 hover:text-primary-700 font-medium transition-colors hover:bg-primary-50 px-2 py-1 rounded-md"
+      >
+        <svg
+          class="w-4 h-4 mr-1"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+          ></path>
+        </svg>
+        Atualizar Taxa
+      </button>
+    </div>
+  </div>
+
+  <div class="space-y-6">
+    <div class="flex flex-col md:flex-row items-start md:items-end gap-4">
+      <div class="flex-1 w-full">
+        <label
+          for="fromCurrency"
+          class="block text-sm font-medium text-gray-800 mb-2"
+        >
+          Moeda de Origem
+        </label>
+        <select
+          id="fromCurrency"
+          [formControl]="conversionForm.controls.fromCurrency"
+          class="input-field w-full"
+        >
+          <option
+            *ngFor="let option of CURRENCIES_OPTIONS"
+            [ngValue]="option.value"
+          >
+            {{ option.label }}
+          </option>
+        </select>
+      </div>
+
+      <div class="flex items-end">
+        <button
+          type="button"
+          (click)="handleSwapCurrencies()"
+          class="h-[42px] w-[42px] flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+          [disabled]="
+            conversionForm.controls.fromCurrency.value ===
+            conversionForm.controls.toCurrency.value
+          "
+          title="Trocar moedas"
+        >
+          <svg
+            class="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"
+            ></path>
+          </svg>
+        </button>
+      </div>
+
+      <div class="flex-1 w-full">
+        <label
+          for="toCurrency"
+          class="block text-sm font-medium text-gray-800 mb-2"
+        >
+          Moeda de Destino
+        </label>
+        <select
+          id="toCurrency"
+          [formControl]="conversionForm.controls.toCurrency"
+          class="input-field w-full"
+        >
+          <option
+            *ngFor="let option of CURRENCIES_OPTIONS"
+            [ngValue]="option.value"
+          >
+            {{ option.label }}
+          </option>
+        </select>
+      </div>
+    </div>
+
+    <div>
+      <div class="flex-1">
+        <label
+          for="amount"
+          class="block text-sm font-medium text-gray-800 mb-2"
+        >
+          {{
+            "Valor em " +
+              getCurrencyName(
+                conversionForm.controls.fromCurrency.value || CURRENCY.OURO_REAL
+              )
+          }}
+        </label>
+        <input
+          id="amount"
+          type="text"
+          [formControl]="conversionForm.controls.amount"
+          class="input-field w-full"
+          placeholder="1000.00"
+          maxlength="10"
+          (input)="validateAmountInput($event, conversionForm.controls.amount)"
+        />
+      </div>
+
+      <div
+        *ngIf="
+          conversionForm.controls.amount.invalid &&
+          conversionForm.controls.amount.touched
+        "
+        class="mt-1 text-sm text-red-600"
+      >
+        <span *ngIf="conversionForm.controls.amount.hasError('required')">
+          O valor é obrigatório
+        </span>
+        <span *ngIf="conversionForm.controls.amount.hasError('min')">
+          O valor deve ser maior que zero
+        </span>
+        <span *ngIf="conversionForm.controls.amount.hasError('max')">
+          O valor não pode exceder 9.999,99
+        </span>
+        <span *ngIf="conversionForm.controls.amount.hasError('pattern')">
+          Formato de valor inválido
+        </span>
+      </div>
+    </div>
+
+    <div
+      *ngIf="conversionResult"
+      class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm animate-fade-in"
+    >
+      <div class="text-center mb-6">
+        <div class="text-sm text-gray-500 mb-3">Resultado da Conversão</div>
+
+        <div class="flex items-center justify-center space-x-4">
+          <div class="text-center">
+            <div class="text-xs text-gray-400 mb-1">
+              {{ getCurrencyName(conversionResult.fromCurrency) }}
+            </div>
+            <div class="text-2xl font-bold text-gray-800">
+              {{ conversionResult.fromAmount | number : "1.2-2" : "pt-BR" }}
+            </div>
+          </div>
+
+          <div class="text-gray-400">
+            <svg
+              class="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M13 7l5 5m0 0l-5 5m5-5H6"
+              ></path>
+            </svg>
+          </div>
+
+          <div class="text-center">
+            <div class="text-xs text-gray-400 mb-1">
+              {{ getCurrencyName(conversionResult.toCurrency) }}
+            </div>
+            <div class="text-2xl font-bold text-green-600">
+              {{ conversionResult.toAmount | number : "1.2-2" : "pt-BR" }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex justify-center">
+      <button
+        (click)="handleConvert()"
+        [disabled]="conversionForm.invalid || (loading$ | async)"
+        class="btn-primary px-8 py-3 text-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+      >
+        <svg
+          *ngIf="!(loading$ | async)"
+          class="w-5 h-5"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"
+          ></path>
+        </svg>
+        <div
+          *ngIf="loading$ | async"
+          class="animate-spin rounded-full h-5 w-5 border-b-2 border-white"
+        ></div>
+        <span>{{
+          (loading$ | async) ? "Convertendo..." : "Converter Moeda"
+        }}</span>
+      </button>
+    </div>
+  </div>
+</div>

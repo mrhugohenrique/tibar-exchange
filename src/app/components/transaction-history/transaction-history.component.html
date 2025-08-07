@@ -1,0 +1,352 @@
+<div class="bg-white rounded-xl card-shadow p-8">
+  <div
+    class="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4"
+  >
+    <div class="flex items-start md:items-center">
+      <div>
+        <h2 class="text-xl md:text-2xl font-bold text-gray-800">
+          Histórico de Transações
+        </h2>
+        <p class="text-gray-600 text-sm md:text-base">
+          Visualize e filtre todas as transações realizadas
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="bg-gray-50 p-6 rounded-lg mb-6">
+    <div class="flex flex-wrap gap-4 items-end">
+      <div class="w-full sm:w-auto flex-1 min-w-[200px]">
+        <label
+          for="fromCurrency"
+          class="block text-sm font-medium text-gray-800 mb-2"
+        >
+          Moeda de Origem
+        </label>
+        <select
+          id="fromCurrency"
+          [formControl]="filterForm.controls.fromCurrency"
+          class="input-field w-full"
+        >
+          <option
+            *ngFor="let option of CURRENCIES_OPTIONS"
+            [ngValue]="option.value"
+          >
+            {{ option.label }}
+          </option>
+        </select>
+      </div>
+
+      <div class="w-full sm:w-auto flex-1 min-w-[200px]">
+        <label
+          for="toCurrency"
+          class="block text-sm font-medium text-gray-800 mb-2"
+        >
+          Moeda de Destino
+        </label>
+        <select
+          id="toCurrency"
+          [formControl]="filterForm.controls.toCurrency"
+          class="input-field w-full"
+        >
+          <option
+            *ngFor="let option of CURRENCIES_OPTIONS"
+            [ngValue]="option.value"
+          >
+            {{ option.label }}
+          </option>
+        </select>
+      </div>
+
+      <div class="w-full sm:w-auto flex-1 min-w-[200px]">
+        <label
+          for="dateFrom"
+          class="block text-sm font-medium text-gray-800 mb-2"
+        >
+          Data de Início
+        </label>
+        <input
+          id="dateFrom"
+          type="date"
+          [formControl]="filterForm.controls.dateFrom"
+          class="input-field w-full"
+        />
+      </div>
+
+      <div class="w-full sm:w-auto flex-1 min-w-[200px]">
+        <label
+          for="dateTo"
+          class="block text-sm font-medium text-gray-800 mb-2"
+        >
+          Data de Fim
+        </label>
+        <input
+          id="dateTo"
+          type="date"
+          [formControl]="filterForm.controls.dateTo"
+          class="input-field w-full"
+        />
+      </div>
+
+      <div class="flex-1 min-w-[300px]">
+        <div class="flex gap-4">
+          <div class="flex-1">
+            <label
+              for="minAmount"
+              class="block text-sm font-medium text-gray-800 mb-2"
+            >
+              Valor Mínimo
+            </label>
+            <input
+              id="minAmount"
+              type="text"
+              [formControl]="filterForm.controls.minAmount"
+              class="input-field w-full"
+              placeholder="0.00"
+              maxlength="10"
+              (input)="
+                validateAmountInput($event, filterForm.controls.minAmount)
+              "
+            />
+          </div>
+
+          <div class="flex-1">
+            <label
+              for="maxAmount"
+              class="block text-sm font-medium text-gray-800 mb-2"
+            >
+              Valor Máximo
+            </label>
+            <input
+              id="maxAmount"
+              type="text"
+              [formControl]="filterForm.controls.maxAmount"
+              class="input-field w-full"
+              placeholder="1000.00"
+              maxlength="10"
+              (input)="
+                validateAmountInput($event, filterForm.controls.maxAmount)
+              "
+            />
+          </div>
+        </div>
+      </div>
+
+      <div class="flex gap-3 mt-4 sm:mt-0">
+        <button
+          type="button"
+          (click)="handleClearFilters()"
+          class="px-4 py-2 text-gray-700 bg-gray-200 hover:bg-gray-300 rounded-lg transition-colors"
+        >
+          Limpar Filtros
+        </button>
+        <button type="button" (click)="handleFilters()" class="btn-primary">
+          Aplicar Filtros
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div
+    class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden"
+  >
+    <div class="hidden md:block">
+      <table class="w-full">
+        <thead style="background-color: #415d87">
+          <tr>
+            <th class="px-4 py-3 text-left text-sm font-medium text-white">
+              ID
+            </th>
+            <th class="px-4 py-3 text-left text-sm font-medium text-white">
+              Moeda de Origem
+            </th>
+            <th class="px-4 py-3 text-left text-sm font-medium text-white">
+              Moeda de Destino
+            </th>
+            <th class="px-4 py-3 text-left text-sm font-medium text-white">
+              Valor
+            </th>
+            <th class="px-4 py-3 text-left text-sm font-medium text-white">
+              Data e Hora
+            </th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100">
+          <tr
+            *ngFor="let transaction of transactions"
+            (click)="openTransactionDetail(transaction)"
+            class="hover:bg-gray-50 cursor-pointer transition-colors"
+          >
+            <td class="px-4 py-3 text-sm font-medium text-gray-900">
+              {{ transaction.id }}
+            </td>
+            <td class="px-4 py-3 text-sm">
+              <span class="font-medium">{{
+                getCurrencyName(transaction.fromCurrency)
+              }}</span>
+            </td>
+            <td class="px-4 py-3 text-sm">
+              <span class="font-medium">{{
+                getCurrencyName(transaction.toCurrency)
+              }}</span>
+            </td>
+            <td class="px-4 py-3 text-sm">
+              <div class="space-y-1">
+                <div class="font-medium text-gray-900">
+                  {{ transaction.fromAmount }}
+                </div>
+              </div>
+            </td>
+            <td class="px-4 py-3 text-sm text-gray-700">
+              {{ formatDate(transaction.timestamp) }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="md:hidden">
+      <div
+        *ngFor="let transaction of transactions"
+        (click)="openTransactionDetail(transaction)"
+        class="p-4 border-b border-gray-100 last:border-b-0 active:bg-gray-50 transition-colors"
+      >
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-sm font-medium text-gray-900">{{
+            transaction.id
+          }}</span>
+          <span class="text-xs text-gray-500">{{
+            formatDate(transaction.timestamp)
+          }}</span>
+        </div>
+
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-2">
+            <span class="text-lg">{{
+              getCurrencyName(transaction.fromCurrency)
+            }}</span>
+            <svg
+              class="w-3 h-3 text-gray-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M17 8l4 4m0 0l-4 4m4-4H3"
+              />
+            </svg>
+            <span class="text-lg">{{
+              getCurrencyName(transaction.toCurrency)
+            }}</span>
+          </div>
+
+          <div class="text-right">
+            <div class="text-sm font-medium text-gray-900">
+              {{ transaction.fromAmount }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="transactions.length === 0" class="text-center py-16">
+      <svg
+        class="w-12 h-12 text-gray-300 mx-auto mb-3"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="1.5"
+          d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+        />
+      </svg>
+      <h3 class="text-base font-medium text-gray-900 mb-1">
+        Nenhuma transação
+      </h3>
+      <p class="text-sm text-gray-500">
+        Realize uma conversão para ver o histórico
+      </p>
+    </div>
+
+    <div
+      *ngIf="transactions.length > 0"
+      class="px-6 py-4 border-t border-gray-200"
+    >
+      <div class="hidden sm:flex items-center justify-between">
+        <div class="text-sm text-gray-700">
+          Mostrando {{ getStartIndex() }} a {{ getEndIndex() }} de
+          {{ pagination.totalItems }} transações
+        </div>
+
+        <div class="flex items-center space-x-1">
+          <button
+            (click)="goToPage(pagination.page - 1)"
+            [disabled]="pagination.page <= 1"
+            class="px-3 py-2 text-sm bg-gray-100 hover:bg-gray-200 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            Anterior
+          </button>
+
+          <div class="flex items-center space-x-1">
+            <button
+              *ngFor="let page of getPageNumbers()"
+              (click)="goToPage(page)"
+              [class]="
+                page === pagination.page
+                  ? 'bg-blue-500 text-white'
+                  : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+              "
+              class="px-3 py-2 text-sm rounded-lg transition-colors"
+            >
+              {{ page }}
+            </button>
+          </div>
+
+          <button
+            (click)="goToPage(pagination.page + 1)"
+            [disabled]="pagination.page >= pagination.totalPages"
+            class="px-3 py-2 text-sm bg-gray-100 hover:bg-gray-200 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            Próxima
+          </button>
+        </div>
+      </div>
+
+      <div class="sm:hidden">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs text-gray-600">
+            Página {{ pagination.page }} de {{ pagination.totalPages }}
+          </span>
+          <span class="text-xs text-gray-500">
+            {{ pagination.totalItems }} total
+          </span>
+        </div>
+
+        <div class="flex space-x-2">
+          <button
+            (click)="goToPage(pagination.page - 1)"
+            [disabled]="pagination.page <= 1"
+            class="flex-1 py-2 px-3 text-xs bg-white border rounded-lg disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+            style="color: #415d87; border-color: #415d87"
+          >
+            ← Anterior
+          </button>
+          <button
+            (click)="goToPage(pagination.page + 1)"
+            [disabled]="pagination.page >= pagination.totalPages"
+            class="flex-1 py-2 px-3 text-xs bg-white border rounded-lg disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+            style="color: #415d87; border-color: #415d87"
+          >
+            Próxima →
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

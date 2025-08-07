@@ -1,1 +1,31 @@
-<router-outlet />
+<div
+  class="min-h-screen bg-gradient-to-br from-primary-50 via-white to-success-50"
+>
+  <app-loading></app-loading>
+  <app-header></app-header>
+
+  <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-1">
+      <div class="flex space-x-1">
+        <a
+          routerLink="/conversao"
+          routerLinkActive="bg-primary-500 text-white hover:bg-primary-900"
+          class="flex-1 flex items-center justify-center px-4 py-3 text-sm font-medium rounded-md transition-colors hover:bg-primary-100"
+        >
+          Conversão de Moedas
+        </a>
+        <a
+          routerLink="/relatorios"
+          routerLinkActive="bg-primary-500 text-white hover:bg-primary-900"
+          class="flex-1 flex items-center justify-center px-4 py-3 text-sm font-medium rounded-md transition-colors hover:bg-primary-100"
+        >
+          Relatórios
+        </a>
+      </div>
+    </div>
+  </nav>
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+    <router-outlet></router-outlet>
+  </main>
+
+</div>

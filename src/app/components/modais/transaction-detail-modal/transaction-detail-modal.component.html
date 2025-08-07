@@ -1,0 +1,119 @@
+<div
+  class="modal-content w-full max-w-xl mx-auto bg-white rounded-lg shadow-lg"
+>
+  <div class="flex items-center justify-between px-4 py-3 border-b">
+    <h3 class="text-lg font-semibold text-gray-800">Detalhes da Transação</h3>
+
+    <button
+      (click)="handleClose()"
+      class="flex items-center justify-center w-8 h-8 rounded-full text-gray-800 hover:text-gray-600 hover:bg-gray-100 transition"
+    >
+      <span class="text-xl font-bold leading-none">×</span>
+    </button>
+  </div>
+
+  <div class="p-6 space-y-6">
+    <div class="text-center bg-gray-50 p-4 rounded-lg">
+      <p class="text-sm text-gray-600 mb-2">ID da Transação</p>
+      <p class="text-2xl font-bold text-gray-800 font-mono">
+        {{ transaction?.id }}
+      </p>
+    </div>
+
+    <div
+      class="text-center bg-gradient-to-r from-primary-50 to-success-50 p-6 rounded-lg border border-primary-200"
+    >
+      <p class="text-sm text-gray-700 mb-4 font-medium">Conversão Realizada</p>
+
+      <div class="flex items-center justify-center gap-4">
+        <div class="text-center">
+          <div class="text-xl font-bold text-gray-800">
+            {{ transaction?.fromAmount | number : "1.2-2" : "pt-BR" }}
+          </div>
+        </div>
+
+        <svg
+          class="w-8 h-8 text-primary-500"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M17 8l4 4m0 0l-4 4m4-4H3"
+          />
+        </svg>
+
+        <div class="text-center">
+          <div class="text-xl font-bold text-gray-800">
+            {{ transaction?.toAmount | number : "1.2-2" : "pt-BR" }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="space-y-4">
+      <h4 class="text-lg font-semibold text-gray-800 border-b pb-2">
+        Informações Detalhadas
+      </h4>
+
+      <div class="grid grid-cols-1 gap-4">
+        <div
+          class="flex justify-between items-center p-3 bg-gray-50 rounded-lg"
+        >
+          <div class="flex items-center">
+            <svg
+              class="w-5 h-5 text-gray-500 mr-2"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"
+              ></path>
+            </svg>
+            <span class="text-gray-700 font-medium">Taxa de Conversão:</span>
+          </div>
+          <span class="font-bold text-gray-900">
+            {{ transaction?.rate | number : "1.2-2" }}
+          </span>
+        </div>
+
+        <div
+          class="flex justify-between items-center p-3 bg-gray-50 rounded-lg"
+        >
+          <div class="flex items-center">
+            <svg
+              class="w-5 h-5 text-gray-500 mr-2"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+              ></path>
+            </svg>
+            <span class="text-gray-700 font-medium">Data e Hora:</span>
+          </div>
+          <span class="font-bold text-gray-900">
+            {{ formatDate(transaction?.timestamp) }}
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="px-6 py-4 bg-gray-50 border-t flex justify-end items-center">
+    <button (click)="handleClose()" class="btn-primary px-6 py-2">
+      Fechar
+    </button>
+  </div>
+</div>

@@ -1,59 +1,130 @@
-# TibarExchange
+# Sistema de Conversão de Moedas - Mercado de Wefin
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.1.4.
+## 📖 Sobre o Projeto
 
-## Development server
+Este é um sistema de conversão de moedas desenvolvido para o **Mercado de Pulgas dos Mil Saberes** na cidade de Wefin, Reino de SRM. O sistema permite a conversão entre **Ouro Real** e **Tibar**, facilitando o comércio entre os habitantes do reino e os anãos comerciantes das montanhas distantes.
 
-To start a local development server, run:
+**Taxa de Conversão:** 1 Ouro Real = 2,5 Tibares (variável conforme demanda do mercado)
 
+## 🚀 Funcionalidades
+
+### 💱 Painel de Conversão
+- **Consulta de Taxas:** Visualização da taxa atual de conversão
+- **Atualização de Taxa:** Modal para edição da taxa de câmbio
+- **Conversão de Moedas:** Formulário para conversão entre Ouro Real e Tibar
+- **Validações:** Verificação de valores negativos e campos obrigatórios
+- **Troca Rápida:** Botão para inverter moedas de origem e destino
+
+### 📊 Histórico de Transações
+- **Tabela Interativa:** Exibição de todas as transações realizadas
+- **Filtros Avançados:** 
+  - Por tipo de moeda (origem/destino)
+  - Por data da transação
+  - Por intervalo de valores
+  - Por nome do mercador
+- **Paginação:** Navegação eficiente entre páginas
+- **Detalhes da Transação:** Modal com informações completas
+
+### 🎨 Design e UX
+- **Design Responsivo:** Otimizado para desktop, tablet e mobile
+- **Animações Suaves:** Micro-interações e transições elegantes
+- **Loading States:** Indicadores visuais durante operações assíncronas
+- **Notificações:** Toasts informativos para feedback do usuário
+
+## 🛠️ Tecnologias Utilizadas
+- **Angular 20** - Framework principal
+- **TypeScript** - Linguagem de programação
+- **Tailwind CSS** - Framework de estilos
+- **NGX-Toastr** - Sistema de notificações
+- **RxJS** - Programação reativa
+- **Jasmine/Karma** - Testes unitários
+
+## 📦 Instalação e Execução
+
+### Pré-requisitos
+- Node.js (versão 18 ou superior)
+- npm ou yarn
+
+### Passos para instalação
+
+1. **Clone o repositório:**
 ```bash
-ng serve
+git clone <url-do-repositorio>
+cd tibar-exchange
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
-
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
+2. **Instale as dependências:**
 ```bash
-ng generate component component-name
+npm install
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
+3. **Execute o projeto em modo de desenvolvimento:**
 ```bash
-ng generate --help
+npm start
 ```
 
-## Building
+4. **Acesse a aplicação:**
+Abra seu navegador e vá para `http://localhost:4200`
 
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+### Scripts Disponíveis
 
 ```bash
-ng test
+npm start
+
+npm run build
+
+npm test
+
 ```
 
-## Running end-to-end tests
+## 🧪 Testes
 
-For end-to-end (e2e) testing, run:
+O projeto inclui **testes unitários abrangentes** cobrindo mais de **80% do código**, incluindo:
 
+### Componentes Testados
+- **Componentes:** CurrencyConverter e TransactionHistory
+  - Validações de formulário
+  - Interações do usuário
+  - Gerenciamento de estado local
+  - Integração com serviços
+
+### Modais Testados
+- **Modais:** UpdateRateModal e TransactionDetailModal
+  - Abertura e fechamento
+  - Validações específicas
+  - Comunicação com componentes pai
+
+### Casos de Teste Cobertos
+- **Modelos:** Validação de tipos e interfaces
+- **Validações:** Formulários e entrada de dados
+- **Estados de Loading:** Operações assíncronas
+- **Tratamento de Erros:** Cenários de falha
+- **Performance:** Otimizações e memory leaks
+
+### Executar testes:
 ```bash
-ng e2e
+npm test
+
+npm run test:watch
 ```
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+## 📁 Estrutura do Projeto
 
-## Additional Resources
+```
+src/
+├── components/
+│   ├── currency-converter/          # Componente de conversão
+│   ├── transaction-history/         # Histórico de transações
+│   ├── transaction-detail-modal/    # Modal de detalhes
+│   ├── update-rate-modal/          # Modal de atualização de taxa
+│   └── loading/                    # Componente de loading
+├── models/
+│   └── currency.model.ts           # Interfaces e tipos
+├── services/
+│   ├── currency.service.ts         # Serviço principal
+│   └── mock-data.service.ts        # Dados mockados
+├── main.ts                         # Ponto de entrada
+└── styles.scss                     # Estilos globais
+```
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+## 📄 Licença
