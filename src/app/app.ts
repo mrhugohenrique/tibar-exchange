@@ -15,6 +15,7 @@ import { LoadingComponent } from './components/loading/loading.component';
     LoadingComponent,
   ],
   templateUrl: './app.html',
+  styleUrl: './app.scss',
 })
 export class App {
   protected readonly title = signal('SRM Reino – Mercado de Wefin');
