@@ -1,13 +1,8 @@
-import {
-  Component,
-  OnInit,
-  OnDestroy,
-  inject,
-} from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { MockDataService } from '../../../services/mock-data.service';
-import { Transaction } from '../../../models/currency.model';
+import { Currency, Transaction } from '../../../models/currency.model';
 import { Subject } from 'rxjs';
 import { DIALOG_DATA, DialogRef } from '@angular/cdk/dialog';
 
@@ -34,6 +29,10 @@ export class TransactionDetailModalComponent implements OnInit, OnDestroy {
 
   handleClose() {
     this._dialogRef.close();
+  }
+
+  getCurrencyName(currency: Currency): string {
+    return this._mockDataService.getCurrencyName(currency);
   }
 
   formatDate(date: Date | undefined): string {

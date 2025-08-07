@@ -21,12 +21,15 @@
     </div>
 
     <div
-      class="text-center bg-gradient-to-r from-primary-50 to-success-50 p-6 rounded-lg border border-primary-200"
+      class="text-center bg-gradient-to-r from-primary-50 to-success-50 p-6 rounded-lg border border-primary-200 "
     >
       <p class="text-sm text-gray-700 mb-4 font-medium">Conversão Realizada</p>
 
       <div class="flex items-center justify-center gap-4">
         <div class="text-center">
+          <div class="text-xs text-gray-400 mb-1">
+            {{ getCurrencyName(transaction?.fromCurrency || 1) }}
+          </div>
           <div class="text-xl font-bold text-gray-800">
             {{ transaction?.fromAmount | number : "1.2-2" : "pt-BR" }}
           </div>
@@ -47,7 +50,10 @@
         </svg>
 
         <div class="text-center">
-          <div class="text-xl font-bold text-gray-800">
+          <div class="text-xs text-gray-400 mb-1">
+            {{ getCurrencyName(transaction?.toCurrency || 2) }}
+          </div>
+          <div class="text-xl font-bold text-green-600">
             {{ transaction?.toAmount | number : "1.2-2" : "pt-BR" }}
           </div>
         </div>

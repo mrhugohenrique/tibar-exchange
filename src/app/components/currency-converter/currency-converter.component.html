@@ -14,7 +14,6 @@
     </div>
 
     <div class="text-left md:text-right">
-      <!-- Header da taxa -->
       <div class="flex items-center justify-start md:justify-end mb-2">
         <svg
           class="w-4 h-4 text-gray-400 mr-2"
@@ -32,7 +31,6 @@
         <span class="text-sm text-gray-500">Taxa Atual</span>
       </div>
 
-      <!-- Valor da taxa -->
       <div class="bg-gray-50 px-3 py-2 rounded-lg mb-3 border border-gray-200">
         <div class="text-lg font-bold text-gray-800 font-mono">
           1 = {{ currentRate?.rate || 0 | number : "1.2-2" }}
@@ -181,7 +179,7 @@
 
     <div
       *ngIf="conversionResult"
-      class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm animate-fade-in"
+      class="bg-gradient-to-r from-primary-50 to-success-50 p-6 rounded-lg border border-primary-200"
     >
       <div class="text-center mb-6">
         <div class="text-sm text-gray-500 mb-3">Resultado da Conversão</div>
