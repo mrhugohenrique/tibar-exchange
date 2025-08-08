@@ -15,6 +15,7 @@ import {
   PaginationOptions,
 } from '../../models/currency.model';
 import { ToastrService } from 'ngx-toastr';
+import { TransactionDetailModalComponent } from '../modais/transaction-detail-modal/transaction-detail-modal.component';
 
 registerLocaleData(localePt, 'pt-BR');
 
@@ -122,11 +123,60 @@ describe('TransactionHistoryComponent', () => {
   });
 
   describe('Filter Management', () => {
-    it('should: clear filters', () => {
+    it('should: show a warning if dateFrom is after dateTo and not call loadTransactions', () => {
       component.filterForm.patchValue({
-        fromCurrency: Currency.OURO_REAL,
-        dateFrom: '2025-01-15',
+        dateFrom: '2025-08-20',
+        dateTo: '2025-08-15',
       });
+      spyOn(component, 'loadTransactions');
+
+      component.handleFilters();
+
+      expect(mockToastrService.warning).toHaveBeenCalledWith(
+        'A data de início não pode ser posterior à data de fim.'
+      );
+      expect(component.loadTransactions).not.toHaveBeenCalled();
+    });
+
+    it('should: show a warning if minAmount is greater than maxAmount and not call loadTransactions', () => {
+      component.filterForm.patchValue({
+        minAmount: 500,
+        maxAmount: 100,
+      });
+      spyOn(component, 'loadTransactions');
+
+      component.handleFilters();
+
+      expect(mockToastrService.warning).toHaveBeenCalledWith(
+        'O valor mínimo nao pode ser maior que o valor máximo'
+      );
+      expect(component.loadTransactions).not.toHaveBeenCalled();
+    });
+
+    it('should: reset pagination page to 1 and call loadTransactions if filters are valid', () => {
+      component.pagination.page = 3;
+      component.filterForm.patchValue({
+        dateFrom: '2025-08-10',
+        dateTo: '2025-08-20',
+        minAmount: 10,
+        maxAmount: 500,
+      });
+      spyOn(component, 'loadTransactions');
+
+      component.handleFilters();
+
+      expect(component.pagination.page).toBe(1);
+      expect(component.loadTransactions).toHaveBeenCalled();
+      expect(mockToastrService.warning).not.toHaveBeenCalled();
+    });
+
+    it('should: clear filters and reset form values', () => {
+      component.filterForm.patchValue({
+        fromCurrency: Currency.TIBAR,
+        dateFrom: '2025-01-15',
+        minAmount: 50,
+      });
+      spyOn(component, 'loadTransactions');
 
       component.handleClearFilters();
 
@@ -137,17 +187,64 @@ describe('TransactionHistoryComponent', () => {
         Currency.TIBAR
       );
       expect(component.filterForm.controls.dateFrom.value).toBeNull();
+      expect(component.filterForm.controls.minAmount.value).toBeNull();
       expect(component.pagination.page).toBe(1);
+      expect(component.loadTransactions).toHaveBeenCalled();
     });
 
-    it('should: apply filters and reset pagination', () => {
-      component.pagination.page = 3;
-      component.filterForm.patchValue({ fromCurrency: Currency.OURO_REAL });
+    it('should: validate same currency and set sameCurrencyError to false', () => {
+      component.filterForm.controls.fromCurrency.setValue(Currency.OURO_REAL);
+      component.filterForm.controls.toCurrency.setValue(Currency.TIBAR);
+      component.validateSameCurrency();
+      expect(component.sameCurrencyError).toBe(false);
+    });
+  });
 
-      component.handleFilters();
+  describe('Amount Input Validation', () => {
+    let mockInputEvent: any;
+    let mockFormControl: any;
 
-      expect(component.pagination.page).toBe(1);
-      expect(mockCurrencyService.getTransactions).toHaveBeenCalled();
+    beforeEach(() => {
+      mockFormControl = {
+        setValue: jasmine.createSpy('setValue'),
+      };
+      mockInputEvent = {
+        target: {
+          value: '',
+        },
+      };
+    });
+
+    it('should: format a number with a comma to a number with a dot', () => {
+      mockInputEvent.target.value = '100,50';
+      component.validateAmountInput(mockInputEvent, mockFormControl);
+      expect(mockFormControl.setValue).toHaveBeenCalledWith(100.5, {
+        emitEvent: false,
+      });
+    });
+
+    it('should: remove non-numeric characters', () => {
+      mockInputEvent.target.value = 'abc123def456';
+      component.validateAmountInput(mockInputEvent, mockFormControl);
+      expect(mockFormControl.setValue).toHaveBeenCalledWith(123456, {
+        emitEvent: false,
+      });
+    });
+
+    it('should: handle multiple dots by keeping only the first one', () => {
+      mockInputEvent.target.value = '100.20.50';
+      component.validateAmountInput(mockInputEvent, mockFormControl);
+      expect(mockFormControl.setValue).toHaveBeenCalledWith(100.205, {
+        emitEvent: false,
+      });
+    });
+
+    it('should: set value to null for non-numeric input', () => {
+      mockInputEvent.target.value = 'abc';
+      component.validateAmountInput(mockInputEvent, mockFormControl);
+      expect(mockFormControl.setValue).toHaveBeenCalledWith(null, {
+        emitEvent: false,
+      });
     });
   });
 
@@ -172,10 +269,13 @@ describe('TransactionHistoryComponent', () => {
       expect(filters.dateFrom?.getDate()).toBe(15);
       expect(filters.dateFrom?.getMonth()).toBe(7);
       expect(filters.dateFrom?.getFullYear()).toBe(2025);
+      expect(filters.dateFrom?.getHours()).toBe(0);
 
       expect(filters.dateTo?.getDate()).toBe(20);
       expect(filters.dateTo?.getMonth()).toBe(7);
       expect(filters.dateTo?.getFullYear()).toBe(2025);
+      expect(filters.dateTo?.getHours()).toBe(23);
+      expect(filters.dateTo?.getMinutes()).toBe(59);
     });
   });
 
@@ -187,13 +287,14 @@ describe('TransactionHistoryComponent', () => {
         totalItems: 50,
         totalPages: 5,
       };
+      spyOn(component, 'loadTransactions');
     });
 
     it('should: go to specific page', () => {
       component.goToPage(3);
 
-      expect(component.pagination.page).toBe(1);
-      expect(mockCurrencyService.getTransactions).toHaveBeenCalled();
+      expect(component.pagination.page).toBe(3);
+      expect(component.loadTransactions).toHaveBeenCalled();
     });
 
     it('should: not go to invalid page numbers', () => {
@@ -201,18 +302,23 @@ describe('TransactionHistoryComponent', () => {
 
       component.goToPage(0);
       expect(component.pagination.page).toBe(originalPage);
+      expect(component.loadTransactions).not.toHaveBeenCalled();
 
       component.goToPage(10);
       expect(component.pagination.page).toBe(originalPage);
+      expect(component.loadTransactions).not.toHaveBeenCalled();
     });
 
     it('should: generate correct page numbers', () => {
+      component.pagination.page = 3;
       const pages = component.getPageNumbers();
+      expect(pages).toEqual([1, 2, 3, 4, 5]);
+    });
 
-      expect(pages).toContain(1);
-      expect(pages).toContain(2);
-      expect(pages).toContain(3);
-      expect(pages.length).toBeLessThanOrEqual(5);
+    it('should: generate correct page numbers for the end of pagination', () => {
+      component.pagination.page = 5;
+      const pages = component.getPageNumbers();
+      expect(pages).toEqual([1, 2, 3, 4, 5]);
     });
 
     it('should: calculate start index correctly', () => {
@@ -230,7 +336,15 @@ describe('TransactionHistoryComponent', () => {
 
       component.openTransactionDetail(transaction);
 
-      expect(mockDialogService.open).toHaveBeenCalled();
+      expect(mockDialogService.open).toHaveBeenCalledWith(
+        TransactionDetailModalComponent,
+        {
+          data: transaction,
+          width: '100%',
+          maxWidth: '90vw',
+          disableClose: true,
+        }
+      );
     });
   });
 
