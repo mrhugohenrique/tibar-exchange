@@ -195,6 +195,13 @@ export class TransactionHistoryComponent implements OnInit, OnDestroy {
       return;
     }
 
+    if(formValue.minAmount && formValue.maxAmount && formValue.minAmount > formValue.maxAmount) {
+      this._toastr.warning(
+        'O valor mínimo nao pode ser maior que o valor máximo'
+      );
+      return;
+    }
+
     this.pagination.page = 1;
     this.loadTransactions();
   }
